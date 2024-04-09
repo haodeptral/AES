@@ -1,5 +1,5 @@
 const sbox = [
-    [0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76],
+    [0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76], 
     [0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0],
     [0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15],
     [0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a, 0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75],
@@ -50,15 +50,7 @@ let keyText = "aesEncryptionKey";
 
 plaintextField = document.getElementById("plainText");
 TextkeyField = document.getElementById("keyText");
-// plaintextField.value = "12345";
-// Call the subBytes function with the initialized state array
-// subBytes(state, sbox);
 
-let state = convertInput(plaintext);
-// console.log(state);
-let key = convertInput(keyText);
-
-// Initialize the state array with the plaintext
 function convertInput(Text) {
     const state = [];
     for (let i = 0; i < 4; i++) {
@@ -68,22 +60,23 @@ function convertInput(Text) {
         }
     }
     return state;
-
+    
 }
-// function convertOutput(state) {
-//     let Text = "";
-//     for (let i = 0; i < 4; i++) {
-//         for (let j = 0; j < 4; j++) {
-//             Text += hexToChar(state[i][j]);
-//         }
-//     }
-//     return Text;
-// }
-// let state;
-// state = convertInput(plaintext); // OK
-// let key = convertInput(keyText); // OK
-// console.log(key);
-// console.log(state);
+
+function convertOutput(state) {
+    let Text = "";
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+            Text += hexToChar(state[i][j]);
+        }
+    }
+    return Text;
+}
+let state;
+state = convertInput(plaintext); // OK
+let key = convertInput(keyText); // OK
+console.log(key);
+console.log(state);
 
 
 function subBytes(state) {
@@ -115,29 +108,19 @@ function rotateLeft(word, number) {
     if (number === 1) {
         // Rotate left by one position
         const tmp = word[0];
-        word[0] = word[1];
-        word[1] = word[2];
-        word[2] = word[3];
-        word[3] = tmp;
-        
+        word[0] = word[1]; word[1] = word[2]; word[2] = word[3]; word[3] = tmp;    
     } else if (number === 2) {
         // Rotate left by two positions
         const tmp = word[0];
         const tmp1 = word[1];
-        word[0] = word[2];
-        word[1] = word[3];
-        word[2] = tmp;
-        word[3] = tmp1;
+        word[0] = word[2]; word[1] = word[3]; word[2] = tmp; word[3] = tmp1;
         
     } else if (number === 3) {
         // Rotate left by three positions
         const tmp = word[0];
         const tmp1 = word[1];
         const tmp2 = word[2];
-        word[0] = word[3];
-        word[1] = tmp;
-        word[2] = tmp1;
-        word[3] = tmp2;
+        word[0] = word[3]; word[1] = tmp; word[2] = tmp1; word[3] = tmp2;
         
     }
     return word;
@@ -232,11 +215,11 @@ function keyExpansion(key) {
     console.log(state2);
     for (let i = 1; i < 10; i++) {
         state2 = addRoundKey(mixColumns(shiftRows(subBytes(state2))), roundKeys[i]);
-        console.log(state2);
+        // console.log(state2);
     }
     let stage12 = addRoundKey(shiftRows(subBytes(state2)), roundKeys[10]);
-    console.log(stage12);
-    console.log("------------------------------------------------------------------------");
+    // console.log(stage12);
+    // console.log("------------------------------------------------------------------------");
     return stage12;
 }
  //OK
@@ -252,8 +235,8 @@ function encrypt(){
     state = convertInput(plaintext);
     key = convertInput(keyText);
     let finalState = aesEncryptBlock(state, key);
-    // let output = convertOutput(finalState);
-    document.getElementById("EncryptedValue").innerHTML = finalState;
+    let output = convertOutput(finalState);
+    document.getElementById("EncryptedValue").innerHTML = output;
     
     return finalState;
 } //OK
@@ -278,6 +261,13 @@ const invSbox = [
         [0x60, 0x51, 0x7f, 0xa9, 0x19, 0xb5, 0x4a, 0x0d, 0x2d, 0xe5, 0x7a, 0x9f, 0x93, 0xc9, 0x9c, 0xef],
         [0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61],
         [0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d]
+];
+
+const invMixColumnsMatrix = [
+    [0x0e, 0x0b, 0x0d, 0x09],
+    [0x09, 0x0e, 0x0b, 0x0d],
+    [0x0d, 0x09, 0x0e, 0x0b],
+    [0x0b, 0x0d, 0x09, 0x0e]
 ];
 
 function invSubBytes(state) {
@@ -305,27 +295,18 @@ function rotateRight(word, number) {
     if (number === 1) {
         // Rotate right by one position
         const tmp = word[3];
-        word[3] = word[2];
-        word[2] = word[1];
-        word[1] = word[0];
-        word[0] = tmp;
+        word[3] = word[2]; word[2] = word[1]; word[1] = word[0]; word[0] = tmp;
     } else if (number === 2) {
         // Rotate right by two positions
         const tmp = word[3];
         const tmp1 = word[2];
-        word[3] = word[1];
-        word[2] = word[0];
-        word[1] = tmp;
-        word[0] = tmp1;
+        word[3] = word[1]; word[2] = word[0]; word[1] = tmp; word[0] = tmp1;
     } else if (number === 3) {
         // Rotate right by three positions
         const tmp = word[3];
         const tmp1 = word[2];
         const tmp2 = word[1];
-        word[3] = word[0];
-        word[2] = tmp;
-        word[1] = tmp1;
-        word[0] = tmp2;
+        word[3] = word[0]; word[2] = tmp; word[1] = tmp1; word[0] = tmp2;
     }
     return word;
 }
@@ -346,12 +327,7 @@ function invMixColumns(state) {
     }
     return newState;
 }
-const invMixColumnsMatrix = [
-    [0x0e, 0x0b, 0x0d, 0x09],
-    [0x09, 0x0e, 0x0b, 0x0d],
-    [0x0d, 0x09, 0x0e, 0x0b],
-    [0x0b, 0x0d, 0x09, 0x0e]
-];
+
 
     
 
@@ -382,7 +358,7 @@ function decrypt(){
     key = convertInput(keyText);
     console.log(key);
     let finalState = aesDecryptBlock(state, key);
-    // let output = convertOutput(finalState);
-    document.getElementById("DecryptedValue").innerHTML = finalState;
+    let output = convertOutput(finalState);
+    document.getElementById("DecryptedValue").innerHTML = output;
 }
 // console.log("------------------------------------------------------------------------");
